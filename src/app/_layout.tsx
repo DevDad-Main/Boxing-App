@@ -1,135 +1,106 @@
 /**
- * Root layout — the app shell.
- *
- * Provides StatusBar and the auth gate. Unauthenticated users see LoginScreen
- * / SignupScreen; authenticated users see AppShell (tabs or onboarding flow).
- * When Supabase is not configured, the auth screens show a clearly labelled
- * development-mode message.
+ * Root layout — zero external imports except React. Hardcoded colors.
+ * setTimeout forces loading off after 3s so we can never get stuck.
  */
-import { StatusBar } from 'react-native';
-import { useEffect, useState } from 'react';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { colors } from '@/lib/theme';
-import { AppShell } from '@/app/shell';
-import { LoginScreen } from '@/components/auth/LoginScreen';
-import { SignupScreen } from '@/components/auth/SignupScreen';
+import { useState, useEffect } from 'react';
 
-type AuthMode = 'login' | 'signup';
-
-const rootStyle = {
-  backgroundColor: colors.obsidian,
-  height: '100vh',
-  width: '100vw',
-  minHeight: '100vh',
-  minWidth: '100vw',
-  display: 'flex',
-  flexDirection: 'column' as const,
-};
-
-const centerStyle = {
-  margin: 'auto',
-  fontFamily: 'system-ui, -apple-system, sans-serif',
-  color: colors.textPrimary,
-};
+const OBSIDIAN = '#151817';
+const IVORY = '#F3F1E9';
+const LIME = '#C8F169';
+const SECONDARY = '#8A948F';
 
 export const RootLayout = () => {
   const [session, setSession] = useState<{ user: unknown } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authMode, setAuthMode] = useState<AuthMode>('login');
   const [error, setError] = useState<string | null>(null);
 
+  // Force loading off after 3s so we never get stuck
   useEffect(() => {
-    let cancelled = false;
-
-    const init = async () => {
-      // Never hang forever: timeout after 8 seconds
-      const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Supabase timed out — check your URL/key in .env')), 8000),
-      );
-
-      if (!isSupabaseConfigured) {
-        if (!cancelled) {
-          setLoading(false);
-          setSession({ user: { id: 'dev-user' } });
-        }
-        return;
-      }
-
-      try {
-        await Promise.race([supabase.auth.getSession(), timeout]);
-        const { data } = await supabase.auth.getSession();
-        if (!cancelled) {
-          setSession(data.session ? { user: data.session.user } : null);
-          setLoading(false);
-        }
-
-        const { data: authSubscription } = supabase.auth.onAuthStateChange(
-          (_event, session) => {
-            if (!cancelled) {
-              setSession(session ? { user: session.user } : null);
-            }
-          },
-        );
-
-        return () => {
-          cancelled = true;
-          authSubscription.subscription.unsubscribe();
-        };
-      } catch (err: any) {
-        if (!cancelled) {
-          setError(err.message || 'Failed to initialize auth.');
-          setLoading(false);
-        }
-      }
-    };
-
-    init();
-    return () => {
-      cancelled = true;
-    };
+    const t = setTimeout(() => {
+      console.log('FORCE timeout: setting loading false');
+      setLoading(false);
+      setError('Supabase did not respond — check .env credentials');
+    }, 3000);
+    return () => clearTimeout(t);
   }, []);
 
   if (loading) {
+    console.log('rendering loading state');
     return (
-      <div style={rootStyle}>
-        <StatusBar barStyle="light-content" />
-        <div style={centerStyle}>
-          <div style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>
-            Boxing
-          </div>
-          <div style={{ fontSize: 14, opacity: 0.7 }}>Loading…</div>
+      <div
+        style={{
+          backgroundColor: OBSIDIAN,
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div style={{ color: IVORY, fontSize: 24, fontWeight: 'bold' }}>
+          Boxing
         </div>
+        <div style={{ color: SECONDARY, marginTop: 8 }}>Loading…</div>
       </div>
     );
   }
 
   if (error) {
+    console.log('rendering error state:', error);
     return (
-      <div style={rootStyle}>
-        <StatusBar barStyle="light-content" />
-        <div style={{ ...centerStyle, color: colors.danger }}>
-          <div style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>
-            Setup error
-          </div>
-          <div style={{ fontSize: 14, marginBottom: 16 }}>{error}</div>
-          <div style={{ fontSize: 12, opacity: 0.7 }}>
-            Check your Supabase URL and anon key in .env, then restart the dev server.
-          </div>
+      <div
+        style={{
+          backgroundColor: OBSIDIAN,
+          height: '100vh',
+          width: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div style={{ color: '#EF4444', fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>
+          Setup error
         </div>
+        <div style={{ color: SECONDARY, marginBottom: 16 }}>{error}</div>
       </div>
     );
   }
 
+  console.log('rendering auth shell, session =', session ? 'yes' : 'no');
+
   return (
-    <div style={rootStyle}>
-      <StatusBar barStyle="light-content" />
-      {session ? <AppShell /> : (
-        <div style={{ flex: 1, padding: 24, backgroundColor: colors.obsidian }}>
-          {authMode === 'login' ? (
-            <LoginScreen onLogin={() => {}} onSignup={() => setAuthMode('signup')} />
-          ) : (
-            <SignupScreen onSignup={() => {}} onLogin={() => setAuthMode('login')} />
-          )}
+    <div
+      style={{
+        backgroundColor: OBSIDIAN,
+        height: '100vh',
+        width: '100vw',
+        padding: 24,
+      }}
+    >
+      {session ? (
+        <div style={{ color: IVORY }}>Authenticated — AppShell</div>
+      ) : (
+        <div style={{ color: IVORY }}>
+          <div style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 16 }}>
+            Sign in
+          </div>
+          <button
+            onClick={() => {}}
+            style={{
+              backgroundColor: LIME,
+              color: OBSIDIAN,
+              border: 'none',
+              padding: '10px 20px',
+              borderRadius: 10,
+              fontSize: 16,
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            Sign in
+          </button>
         </div>
       )}
     </div>
