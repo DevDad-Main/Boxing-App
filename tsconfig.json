@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "allowJs": true,
     "jsx": "react-jsx",
     "noEmit": true,
@@ -16,10 +20,27 @@
     "resolveJsonModule": true,
     "allowUmdGlobalAccess": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
-    "types": ["@types/react", "@types/react-native", "node"]
+    "types": [
+      "@types/react",
+      "@types/react-native",
+      "node"
+    ]
   },
-  "include": ["**/*.ts", "**/*.tsx", "node_modules/expo-router/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", "web-build"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "node_modules/expo-router/**/*.d.ts",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "web-build"
+  ],
+  "extends": "expo/tsconfig.base"
 }
