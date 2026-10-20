@@ -2,7 +2,7 @@
 
 Milestone-based task tracking. Work in priority order. Do not skip quality gates.
 
-## Milestone 1 — Repo scaffolding + design system foundation (Phase 1 exit)
+## Milestone 1 — Repo scaffolding + design system foundation (DONE)
 
 - [x] Fix tsconfig for TypeScript 7 (`moduleResolution: "bundler"`, remove `baseUrl`)
 - [x] Fix Box.tsx (unused imports, readonly style properties)
@@ -18,20 +18,26 @@ Milestone-based task tracking. Work in priority order. Do not skip quality gates
 - [x] Create src/app/_layout.tsx (root layout + auth gate)
 - [x] Create src/app/shell.tsx (tab shell: mobile bottom tabs + desktop sidebar)
 - [x] `npx tsc --noEmit` passes
-- [ ] Set up Vitest smoke test
-- [ ] `npm test` passes
-- [ ] Commit Milestone 1
+- [x] Set up Vitest smoke test
+- [x] `npm test` passes
+- [x] Commit Milestone 1 (3f630bf)
 
-## Milestone 2 — Responsive layouts + navigation (Phase 2)
+## Milestone 2 — Responsive layouts + navigation (IN PROGRESS)
 
-- [ ] Create onboarding screens (welcome, experience, goals, availability, complete)
-- [ ] Create auth screens (login, signup, reset)
-- [ ] Create academy lesson browser + lesson detail
-- [ ] Create exercise library search + exercise detail
-- [ ] Create guided workout player skeleton (timer, steps)
-- [ ] Create progress dashboard skeleton (stat tiles, empty state)
-- [ ] Wire expo-router navigation between tabs and detail screens
-- [ ] Desktop sidebar + mobile bottom tab parity
+- [x] Create OnboardingFlow multi-step wizard (welcome, experience, goals,
+      availability, equipment, intensity, limitations, complete)
+- [x] Wire OnboardingFlow into AppShell (full-screen until complete)
+- [x] Create LoginScreen + SignupScreen (Supabase Auth, dev-mode stub)
+- [x] Wire auth screens into RootLayout
+- [x] Create AcademyScreen (curriculum categories, sample data)
+- [x] Create LibraryScreen (searchable exercise library, filters)
+- [x] Create WorkoutPlayerScreen (timer, work/rest, rounds, pause/skip)
+- [x] Create ProgressScreen (stat tiles, consistency, skill progress)
+- [x] Wire all screens into shell (mobile bottom tabs + desktop sidebar)
+- [ ] Add lesson detail screen (academy lesson view)
+- [ ] Add exercise detail screen (library exercise view)
+- [ ] Wire Expo Router routes for /lesson/[id], /exercise/[id], /workout/[id]
+- [ ] Desktop sidebar + mobile bottom tab parity verified
 
 ## Milestone 3 — Functional MVP (Phase 3)
 
@@ -59,7 +65,19 @@ Milestone-based task tracking. Work in priority order. Do not skip quality gates
 
 ## Known limitations
 
-- Supabase not configured: app runs in development mode with stub client. Set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` to enable real auth/database.
+- Supabase not configured: app runs in development mode with stub client.
+  Set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` to enable real auth/database.
 - No native iOS/Android builds yet (web MVP first; EAS path documented but not built).
 - No subscription/payment flows (entitlements table reserved in schema, UI gating future-ready).
-- All tab screens except Home are placeholders ("coming soon").
+- All data is sample/demonstration data. No real coaching content or progress persisted yet.
+- tsconfig `extends: expo/tsconfig.base` is removed to keep vitest working;
+  Expo dev server may re-add it on restart — remove it again if tests fail.
+
+## Web dev server
+
+Running on http://localhost:8081 (Expo web). Start with: `npx expo start --web --port 8081`
+
+## Commit convention
+
+`feat:` for new features, `fix:` for bug fixes, `chore:` for maintenance.
+Commit frequently — at the end of each coherent change set.
