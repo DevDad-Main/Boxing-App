@@ -218,6 +218,37 @@ export function LoginScreen({ onLogin, onSignup }: LoginScreenProps) {
           Tries sign-in; if the user doesn't exist yet, sign up first.
         </div>
       </div>
+
+      <div
+        style={{
+          marginTop: 16,
+          paddingTop: 16,
+          borderTop: `1px solid ${colors.border}`,
+        }}
+      >
+        <div style={{ color: colors.textMuted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+          Dev only — bypass Supabase
+        </div>
+        <button
+          onClick={onLogin}
+          style={{
+            backgroundColor: colors.graphite,
+            color: colors.textPrimary,
+            border: `1px solid ${colors.border}`,
+            borderRadius: 10,
+            padding: 10,
+            fontSize: 13,
+            fontWeight: '600' as const,
+            width: '100%',
+            cursor: 'pointer' as const,
+          }}
+        >
+          Dev mode: skip sign in (no Supabase)
+        </button>
+        <div style={{ color: colors.textMuted, fontSize: 11, marginTop: 6 }}>
+          Enters the app without Supabase auth. Development only — not real authentication.
+        </div>
+      </div>
     </form>
   );
 }

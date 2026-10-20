@@ -139,9 +139,21 @@ export const RootLayout = () => {
       {session ? <AppShell /> : (
         <div style={{ flex: 1, padding: 24, backgroundColor: colors.obsidian }}>
           {authMode === 'login' ? (
-            <LoginScreen onLogin={() => {}} onSignup={() => setAuthMode('signup')} />
+            <LoginScreen
+              onLogin={() => {
+                // Dev mode: skip Supabase entirely and set a dev session
+                setSession({ user: { id: 'dev-user' } });
+              }}
+              onSignup={() => setAuthMode('signup')}
+            />
           ) : (
-            <SignupScreen onSignup={() => {}} onLogin={() => setAuthMode('login')} />
+            <SignupScreen
+              onSignup={() => {
+                // Dev mode: skip Supabase entirely and set a dev session
+                setSession({ user: { id: 'dev-user' } });
+              }}
+              onLogin={() => setAuthMode('login')}
+            />
           )}
         </div>
       )}
