@@ -9,7 +9,6 @@
 import { StatusBar } from 'react-native';
 import { useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
-import { Box } from '@/components/ui/Box';
 import { Text } from '@/components/ui/Text';
 import { colors } from '@/lib/theme';
 import { AppShell } from '@/app/shell';
@@ -17,6 +16,16 @@ import { LoginScreen } from '@/components/auth/LoginScreen';
 import { SignupScreen } from '@/components/auth/SignupScreen';
 
 type AuthMode = 'login' | 'signup';
+
+const rootStyle = {
+  backgroundColor: colors.obsidian,
+  height: '100vh',
+  width: '100vw',
+  minHeight: '100vh',
+  minWidth: '100vw',
+  display: 'flex',
+  flexDirection: 'column' as const,
+};
 
 export const RootLayout = () => {
   const [session, setSession] = useState<{ user: unknown } | null>(null);
@@ -71,17 +80,20 @@ export const RootLayout = () => {
 
   if (loading) {
     return (
-      <Box bg="obsidian" flex={1}>
+      <div style={rootStyle}>
         <StatusBar barStyle="light-content" />
-      </Box>
+        <Text variant="heading" style={{ color: colors.textPrimary, marginTop: 'auto', marginBottom: 'auto' }}>
+          Boxing — loading…
+        </Text>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box bg="obsidian" flex={1} p={24} style={{ backgroundColor: colors.obsidian }}>
+      <div style={rootStyle}>
         <StatusBar barStyle="light-content" />
-        <Text variant="heading" style={{ color: colors.textPrimary, textAlign: 'center', marginBottom: 16 }}>
+        <Text variant="heading" style={{ color: colors.danger, textAlign: 'center', marginBottom: 16 }}>
           Setup error
         </Text>
         <Text variant="body" style={{ color: colors.textSecondary, textAlign: 'center', marginBottom: 16 }}>
@@ -90,22 +102,22 @@ export const RootLayout = () => {
         <Text variant="caption" style={{ color: colors.textMuted, textAlign: 'center' }}>
           Check your Supabase URL and anon key in .env, then restart the dev server.
         </Text>
-      </Box>
+      </div>
     );
   }
 
   return (
-    <Box bg="obsidian" flex={1}>
+    <div style={rootStyle}>
       <StatusBar barStyle="light-content" />
       {session ? <AppShell /> : (
-        <Box flex={1} p={24} style={{ backgroundColor: colors.obsidian }}>
+        <div style={{ flex: 1, padding: 24, backgroundColor: colors.obsidian }}>
           {authMode === 'login' ? (
             <LoginScreen onLogin={() => {}} onSignup={() => setAuthMode('signup')} />
           ) : (
             <SignupScreen onSignup={() => {}} onLogin={() => setAuthMode('login')} />
           )}
-        </Box>
+        </div>
       )}
-    </Box>
+    </div>
   );
 };
