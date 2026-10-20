@@ -12,6 +12,10 @@ import { Text } from '@/components/ui/Text';
 import { Button } from '@/components/ui/Button';
 import { colors, breakpoints } from '@/lib/theme';
 import { OnboardingFlow, OnboardingData } from '@/components/onboarding/OnboardingFlow';
+import { AcademyScreen } from '@/components/academy/AcademyScreen';
+import { LibraryScreen } from '@/components/library/LibraryScreen';
+import { ProgressScreen } from '@/components/progress/ProgressScreen';
+import { WorkoutPlayerScreen } from '@/components/workout/WorkoutPlayerScreen';
 
 type Tab = 'home' | 'academy' | 'library' | 'calendar' | 'profile';
 
@@ -26,6 +30,7 @@ const tabLabels: Record<Tab, string> = {
 export function AppShell() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [onboardingComplete, setOnboardingComplete] = useState(false);
+  const [workoutActive, setWorkoutActive] = useState(false);
   const isDesktop =
     Platform.OS === 'web' &&
     typeof window !== 'undefined' &&
@@ -37,6 +42,9 @@ export function AppShell() {
     setOnboardingComplete(true);
   };
 
+  const startWorkout = () => setWorkoutActive(true);
+  const endWorkout = () => setWorkoutActive(false);
+
   // Until onboarding is complete, show the onboarding flow full-screen.
   if (!onboardingComplete) {
     return (
@@ -46,18 +54,39 @@ export function AppShell() {
     );
   }
 
+  // Full-screen workout player overlay
+  if (workoutActive) {
+    return (
+      <Box bg="obsidian" flex={1}>
+        <WorkoutPlayerScreen onComplete={endWorkout} />
+      </Box>
+    );
+  }
+
   return (
     <Box style={styles.container} bg="obsidian" flex={1}>
-      {isDesktop ? <DesktopShell activeTab={activeTab} setActiveTab={setActiveTab} /> : <MobileShell activeTab={activeTab} setActiveTab={setActiveTab} />}
+      {isDesktop ? (
+        <DesktopShell activeTab={activeTab} setActiveTab={setActiveTab} startWorkout={startWorkout} />
+      ) : (
+        <MobileShell activeTab={activeTab} setActiveTab={setActiveTab} startWorkout={startWorkout} />
+      )}
     </Box>
   );
 }
 
-function MobileShell({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTab: (t: Tab) => void }) {
+function MobileShell({
+  activeTab,
+  setActiveTab,
+  startWorkout,
+}: {
+  activeTab: Tab;
+  setActiveTab: (t: Tab) => void;
+  startWorkout: () => void;
+}) {
   return (
     <Box style={styles.mobileContainer} flex={1}>
       <Box style={styles.content} flex={1}>
-        {renderTabContent(activeTab)}
+        {renderTabContent(activeTab, startWorkout)}
       </Box>
       <Box style={styles.tabBar}>
         {Object.keys(tabLabels).map((key) => {
@@ -94,7 +123,15 @@ function MobileShell({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTab
   );
 }
 
-function DesktopShell({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTab: (t: Tab) => void }) {
+function DesktopShell({
+  activeTab,
+  setActiveTab,
+  startWorkout,
+}: {
+  activeTab: Tab;
+  setActiveTab: (t: Tab) => void;
+  startWorkout: () => void;
+}) {
   return (
     <Box style={styles.desktopContainer} flex={1}>
       <Box style={styles.sidebar} bg="obsidian">
@@ -134,57 +171,80 @@ function DesktopShell({ activeTab, setActiveTab }: { activeTab: Tab; setActiveTa
               </Button>
             );
           })}
+          <Box style={{ marginTop: 24 }}>
+            <Button variant="primary" onPress={startWorkout} style={{ width: '100%' }}>
+              <Text variant="body" style={{ color: colors.obsidian }}>Start workout</Text>
+            </Button>
+          </Box>
         </Box>
       </Box>
       <Box style={styles.desktopContent} flex={1}>
-        {renderTabContent(activeTab)}
+        {renderTabContent(activeTab, startWorkout)}
       </Box>
     </Box>
   );
 }
 
-function renderTabContent(tab: Tab) {
+function renderTabContent(tab: Tab, startWorkout: () => void) {
   switch (tab) {
     case 'home':
-      return <HomeScreen />;
+      return <HomeScreen startWorkout={startWorkout} />;
     case 'academy':
-      return <PlaceholderScreen title="Boxing Academy" body="Curriculum browser coming soon." />;
+      return (
+        <AcademyScreen
+          onLessonPress={(_lessonId) => {
+            // TODO: navigate to lesson detail
+          }}
+        />
+      );
     case 'library':
-      return <PlaceholderScreen title="Exercise Library" body="Searchable exercise library coming soon." />;
+      return (
+        <LibraryScreen
+          onExercisePress={(_exerciseId) => {
+            // TODO: navigate to exercise detail
+          }}
+        />
+      );
     case 'calendar':
       return <PlaceholderScreen title="Training Calendar" body="Your training schedule coming soon." />;
     case 'profile':
-      return <PlaceholderScreen title="Profile" body="Preferences and account settings coming soon." />;
+      return <ProgressScreen />;
     default:
-      return <HomeScreen />;
+      return <HomeScreen startWorkout={startWorkout} />;
   }
 }
 
-function HomeScreen() {
+function HomeScreen({ startWorkout }: { startWorkout: () => void }) {
   return (
-    <EmptyScreen
-      title="Training Dashboard"
-      body="Complete onboarding to see what to work on today."
-      actionLabel="Get started"
-      onAction={() => {}}
-    />
+    <Box style={styles.emptyContainer} bg="graphite" p={24}>
+      <Text variant="heading-sm" style={{ color: colors.textPrimary, marginBottom: 8 }}>
+        Training Dashboard
+      </Text>
+      <Text variant="body-muted" style={{ color: colors.textSecondary, marginBottom: 20 }}>
+        Complete your first workout to see today's training recommendations here.
+      </Text>
+      <Button variant="primary" onPress={startWorkout} style={{ width: '100%', maxWidth: 200 }}>
+        <Text variant="body" style={{ color: colors.obsidian }}>Start workout</Text>
+      </Button>
+    </Box>
   );
 }
 
 function PlaceholderScreen({ title, body }: { title: string; body: string }) {
-  return <EmptyScreen title={title} body={body} />;
+  return (
+    <EmptyScreen
+      title={title}
+      body={body}
+    />
+  );
 }
 
 function EmptyScreen({
   title,
   body,
-  actionLabel,
-  onAction,
 }: {
   title: string;
   body: string;
-  actionLabel?: string;
-  onAction?: () => void;
 }) {
   return (
     <Box style={styles.emptyContainer} bg="graphite" p={24}>
@@ -194,7 +254,6 @@ function EmptyScreen({
       <Text variant="body-muted" style={{ color: colors.textSecondary, marginBottom: 20 }}>
         {body}
       </Text>
-      {actionLabel && onAction && <Button variant="primary" onPress={onAction}>{actionLabel}</Button>}
     </Box>
   );
 }
