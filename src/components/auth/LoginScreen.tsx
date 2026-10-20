@@ -88,7 +88,18 @@ export function LoginScreen({ onLogin, onSignup }: LoginScreenProps) {
       if (authError) throw authError;
       onLogin();
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please try again.');
+      // If user doesn't exist yet, try creating them (dev convenience)
+      if (err.message?.includes('Invalid login') || err.message?.includes('Email not confirmed')) {
+        try {
+          const { error: signUpError } = await supabase.auth.signUp({ email, password });
+          if (signUpError) throw signUpError;
+          setError('Account created — please sign in.');
+        } catch (signUpErr: any) {
+          setError(signUpErr.message || 'Login failed. Please try again.');
+        }
+      } else {
+        setError(err.message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -172,6 +183,41 @@ export function LoginScreen({ onLogin, onSignup }: LoginScreenProps) {
           Development mode: Supabase not configured.
         </div>
       )}
+
+      <div
+        style={{
+          marginTop: 24,
+          paddingTop: 16,
+          borderTop: `1px solid ${colors.border}`,
+        }}
+      >
+        <div style={{ color: colors.textMuted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+          Dev only
+        </div>
+        <button
+          onClick={() => {
+            setEmail('test@boxing.app');
+            setPassword('test-password-123');
+          }}
+          style={{
+            backgroundColor: 'transparent',
+            color: colors.lime,
+            border: `1px solid ${colors.lime}`,
+            borderRadius: 10,
+            padding: 10,
+            fontSize: 13,
+            fontWeight: '600' as const,
+            width: '100%',
+            cursor: 'pointer' as const,
+            marginBottom: 8,
+          }}
+        >
+          Load test user (test@boxing.app)
+        </button>
+        <div style={{ color: colors.textMuted, fontSize: 11, marginTop: 6 }}>
+          Tries sign-in; if the user doesn't exist yet, sign up first.
+        </div>
+      </div>
     </form>
   );
 }

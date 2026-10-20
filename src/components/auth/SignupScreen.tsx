@@ -185,6 +185,38 @@ export function SignupScreen({ onSignup, onLogin }: SignupScreenProps) {
           Development mode: Supabase not configured.
         </div>
       )}
+
+      <div
+        style={{
+          marginTop: 24,
+          paddingTop: 16,
+          borderTop: `1px solid ${colors.border}`,
+        }}
+      >
+        <div style={{ color: colors.textMuted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 }}>
+          Dev only
+        </div>
+        <button
+          onClick={() => {
+            setEmail('test@boxing.app');
+            setPassword('test-password-123');
+            setConfirmPassword('test-password-123');
+          }}
+          style={{
+            backgroundColor: 'transparent',
+            color: colors.lime,
+            border: `1px solid ${colors.lime}`,
+            borderRadius: 10,
+            padding: 10,
+            fontSize: 13,
+            fontWeight: '600' as const,
+            width: '100%',
+            cursor: 'pointer' as const,
+          }}
+        >
+          Load test user (test@boxing.app)
+        </button>
+      </div>
     </form>
   );
 }
