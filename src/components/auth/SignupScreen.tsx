@@ -2,13 +2,12 @@
  * SignupScreen — email/password account creation.
  *
  * Connects to Supabase Auth. When Supabase is not configured, shows a
- * development-mode message instead of pretending a live integration exists.
+ * clearly labelled development-mode message instead of pretending a live
+ * integration exists.
+ *
+ * Uses plain HTML inputs for reliable web rendering.
  */
-import { TextInput } from 'react-native';
 import { useState } from 'react';
-import { Box } from '@/components/ui/Box';
-import { Text } from '@/components/ui/Text';
-import { Button } from '@/components/ui/Button';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { colors } from '@/lib/theme';
 
@@ -17,6 +16,53 @@ interface SignupScreenProps {
   onLogin: () => void;
 }
 
+const inputStyle = {
+  backgroundColor: colors.graphite,
+  border: `1px solid ${colors.border}`,
+  borderRadius: 10,
+  color: colors.textPrimary,
+  padding: 12,
+  fontSize: 16,
+  width: '100%',
+  boxSizing: 'border-box' as const,
+  marginTop: 4,
+  marginBottom: 16,
+};
+
+const labelStyle = {
+  color: colors.textSecondary,
+  fontSize: 14,
+  fontWeight: '600' as const,
+  marginBottom: 6,
+  display: 'block' as const,
+};
+
+const primaryButtonStyle = {
+  backgroundColor: colors.lime,
+  color: colors.obsidian,
+  border: 'none',
+  borderRadius: 10,
+  padding: 12,
+  fontSize: 16,
+  fontWeight: '700' as const,
+  width: '100%',
+  cursor: 'pointer' as const,
+  marginTop: 8,
+};
+
+const ghostButtonStyle = {
+  backgroundColor: 'transparent',
+  color: colors.textPrimary,
+  border: `1px solid ${colors.border}`,
+  borderRadius: 10,
+  padding: 12,
+  fontSize: 16,
+  fontWeight: '600' as const,
+  width: '100%',
+  cursor: 'pointer' as const,
+  marginTop: 8,
+};
+
 export function SignupScreen({ onSignup, onLogin }: SignupScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +70,8 @@ export function SignupScreen({ onSignup, onLogin }: SignupScreenProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
@@ -52,56 +99,92 @@ export function SignupScreen({ onSignup, onLogin }: SignupScreenProps) {
   };
 
   return (
-    <Box bg="obsidian" flex={1} p={24} style={{ backgroundColor: colors.obsidian }}>
-      <Text variant="heading" style={{ color: colors.textPrimary, textAlign: 'center', marginBottom: 8 }}>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        backgroundColor: colors.obsidian,
+        minHeight: '100vh',
+        width: '100vw',
+        padding: 24,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 0,
+      }}
+    >
+      <div style={{ color: colors.textPrimary, fontSize: 24, fontWeight: '700', marginBottom: 8 }}>
         Create account
-      </Text>
-      <Text variant="body-muted" style={{ color: colors.textSecondary, textAlign: 'center', marginBottom: 24 }}>
+      </div>
+      <div style={{ color: colors.textSecondary, marginBottom: 24 }}>
         Join the platform and start your training.
-      </Text>
+      </div>
 
       {error && (
-        <Box style={{ marginBottom: 16, backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 1, borderColor: colors.danger, borderRadius: 10, padding: 12 }}>
-          <Text variant="caption" style={{ color: colors.danger }}>
-            {error}
-          </Text>
-        </Box>
+        <div
+          style={{
+            marginBottom: 16,
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: `1px solid ${colors.danger}`,
+            borderRadius: 10,
+            padding: 12,
+            color: colors.danger,
+            fontSize: 13,
+          }}
+        >
+          {error}
+        </div>
       )}
 
-      <Box style={{ marginBottom: 16 }}>
-        <Text variant="label" style={{ color: colors.textSecondary, marginBottom: 6 }}>Email address</Text>
-        <Box style={{ backgroundColor: colors.graphite, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 12 }}>
-          <TextInput value={email} onChangeText={setEmail} placeholder="you@example.com" placeholderTextColor={colors.textMuted} style={{ color: colors.textPrimary, paddingVertical: 12 }} />
-        </Box>
-      </Box>
+      <label style={labelStyle}>Email address</label>
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="you@example.com"
+        style={inputStyle}
+      />
 
-      <Box style={{ marginBottom: 16 }}>
-        <Text variant="label" style={{ color: colors.textSecondary, marginBottom: 6 }}>Password</Text>
-        <Box style={{ backgroundColor: colors.graphite, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 12 }}>
-          <TextInput value={password} onChangeText={setPassword} placeholder="••••••••" placeholderTextColor={colors.textMuted} secureTextEntry style={{ color: colors.textPrimary, paddingVertical: 12 }} />
-        </Box>
-      </Box>
+      <label style={labelStyle}>Password</label>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="••••••••"
+        style={inputStyle}
+      />
 
-      <Box style={{ marginBottom: 20 }}>
-        <Text variant="label" style={{ color: colors.textSecondary, marginBottom: 6 }}>Confirm password</Text>
-        <Box style={{ backgroundColor: colors.graphite, borderWidth: 1, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 12 }}>
-          <TextInput value={confirmPassword} onChangeText={setConfirmPassword} placeholder="••••••••" placeholderTextColor={colors.textMuted} secureTextEntry style={{ color: colors.textPrimary, paddingVertical: 12 }} />
-        </Box>
-      </Box>
+      <label style={labelStyle}>Confirm password</label>
+      <input
+        type="password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        placeholder="••••••••"
+        style={inputStyle}
+      />
 
-      <Button variant="primary" onPress={handleSubmit} loading={loading} disabled={loading} style={{ width: '100%', marginBottom: 16 }}>
-        <Text variant="body" style={{ color: colors.obsidian }}>Create account</Text>
-      </Button>
+      <button type="submit" style={primaryButtonStyle} disabled={loading}>
+        {loading ? 'Creating account…' : 'Create account'}
+      </button>
 
-      <Button variant="ghost" onPress={onLogin} style={{ width: '100%' }}>
-        <Text variant="body" style={{ color: colors.textPrimary }}>Already have an account? Sign in</Text>
-      </Button>
+      <button
+        type="button"
+        onClick={onLogin}
+        style={ghostButtonStyle}
+      >
+        Already have an account? Sign in
+      </button>
 
       {!isSupabaseConfigured && (
-        <Text variant="caption" style={{ marginTop: 20, textAlign: 'center', color: colors.textMuted }}>
+        <div
+          style={{
+            marginTop: 20,
+            color: colors.textMuted,
+            fontSize: 12,
+            textAlign: 'center',
+          }}
+        >
           Development mode: Supabase not configured.
-        </Text>
+        </div>
       )}
-    </Box>
+    </form>
   );
 }
