@@ -191,11 +191,7 @@ function renderTabContent(tab: Tab, startWorkout: () => void) {
       return <HomeScreen startWorkout={startWorkout} />;
     case 'academy':
       return (
-        <AcademyScreen
-          onLessonPress={(_lessonId) => {
-            // TODO: navigate to lesson detail
-          }}
-        />
+        <AcademyScreen />
       );
     case 'library':
       return (
