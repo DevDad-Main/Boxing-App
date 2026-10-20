@@ -1,4 +1,4 @@
 import { registerRootComponent } from 'expo';
-import Router from 'expo-router';
+import { RootLayout } from './src/app/_layout';
 
-registerRootComponent(Router);
+registerRootComponent(RootLayout);
