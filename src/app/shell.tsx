@@ -11,6 +11,7 @@ import { Box } from '@/components/ui/Box';
 import { Text } from '@/components/ui/Text';
 import { Button } from '@/components/ui/Button';
 import { colors, breakpoints } from '@/lib/theme';
+import { OnboardingFlow, OnboardingData } from '@/components/onboarding/OnboardingFlow';
 
 type Tab = 'home' | 'academy' | 'library' | 'calendar' | 'profile';
 
@@ -24,10 +25,26 @@ const tabLabels: Record<Tab, string> = {
 
 export function AppShell() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
+  const [onboardingComplete, setOnboardingComplete] = useState(false);
   const isDesktop =
     Platform.OS === 'web' &&
     typeof window !== 'undefined' &&
     window.innerWidth >= breakpoints.md;
+
+  const handleOnboardingComplete = (data: OnboardingData) => {
+    // TODO: persist to Supabase profiles table once connected
+    console.log('Onboarding complete:', data);
+    setOnboardingComplete(true);
+  };
+
+  // Until onboarding is complete, show the onboarding flow full-screen.
+  if (!onboardingComplete) {
+    return (
+      <Box bg="obsidian" flex={1}>
+        <OnboardingFlow onComplete={handleOnboardingComplete} />
+      </Box>
+    );
+  }
 
   return (
     <Box style={styles.container} bg="obsidian" flex={1}>
