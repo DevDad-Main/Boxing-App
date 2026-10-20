@@ -1,11 +1,11 @@
 /**
- * Root layout — absolute minimal debug: no hooks, no imports except React.
+ * Root layout — test with block layout instead of flex.
  */
 import { useState } from 'react';
 
 export const RootLayout = () => {
   if (typeof window !== 'undefined') {
-    console.log('RootLayout component function executed');
+    console.log('RootLayout mounted');
   }
   return (
     <div
@@ -13,16 +13,33 @@ export const RootLayout = () => {
         backgroundColor: '#151817',
         height: '100vh',
         width: '100vw',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        minHeight: '100vh',
       }}
     >
-      <div style={{ color: '#F3F1E9', fontSize: 32, fontWeight: 'bold' }}>
+      <div
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: '#F3F1E9',
+          fontSize: 32,
+          fontWeight: 'bold',
+        }}
+      >
         BOXING
       </div>
-      <div style={{ color: '#C8F169', marginTop: 12, fontSize: 16 }}>
-        Debug mode — if you see this, React works
+      <div
+        style={{
+          position: 'absolute',
+          top: '60%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          color: '#C8F169',
+          fontSize: 16,
+        }}
+      >
+        Debug mode
       </div>
     </div>
   );
